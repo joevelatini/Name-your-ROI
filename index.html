@@ -68,6 +68,7 @@
             font-size: 20px;
             font-weight: bold;
             padding: 12px 8px;
+            font-style: italic;
         }
         .arrow {
             font-size: 16px;
@@ -79,7 +80,7 @@
             margin-top: 5px;
             font-style: italic;
         }
-        h1, h2 {
+        h1, h2, h3 {
             color: #1a365d;
         }
         .export-btn {
@@ -116,6 +117,7 @@
     <div class="results" id="results">
         <h2>ROI Results for <span id="company-size">400</span> Person Business Spending $<span id="annual-spend">48,000</span></h2>
         
+        <h3>Examples:</h3>
         <table>
             <thead>
                 <tr>
@@ -127,10 +129,10 @@
             </thead>
             <tbody>
                 <tr class="metrics-row">
-                    <td><span id="current-productivity">7.5</span> <span class="arrow">→</span> <span id="future-productivity">8.0</span></td>
-                    <td><span id="current-underutilized">30%</span> <span class="arrow">→</span> <span id="future-underutilized">15%</span></td>
-                    <td><span id="current-untapped">200</span> <span class="arrow">→</span> <span id="future-untapped">100</span></td>
-                    <td><span id="current-loss">$50,000</span> <span class="arrow">→</span> <span id="future-loss">$25,000</span></td>
+                    <td><i><span id="current-productivity">7.5</span> <span class="arrow">→</span> <span id="future-productivity">8.0</span></i></td>
+                    <td><i><span id="current-underutilized">30%</span> <span class="arrow">→</span> <span id="future-underutilized">15%</span></i></td>
+                    <td><i><span id="current-untapped">200</span> <span class="arrow">→</span> <span id="future-untapped">100</span></i></td>
+                    <td><i><span id="current-loss">$50,000</span> <span class="arrow">→</span> <span id="future-loss">$25,000</span></i></td>
                 </tr>
             </tbody>
         </table>
@@ -157,7 +159,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get elements
+            // Get all necessary elements
             const calculateBtn = document.getElementById('calculate');
             const exportBtn = document.getElementById('export-html');
             
@@ -193,6 +195,7 @@
                     // Convert to FTE (assuming 8-hour workday)
                     const fteGain = hoursGain / 8;
                     // Calculate annual savings
+                    const dailyRate = avgSalary / (workWeeks * 5); // Daily salary rate
                     const savings = fteGain * avgSalary;
                     // Calculate ROI
                     const roi = savings / annualCost;
@@ -232,9 +235,9 @@
                         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
                         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
                         th { background-color: #1a365d; color: white; }
-                        .metrics-row td { font-size: 20px; font-weight: bold; padding: 12px 8px; }
+                        .metrics-row td { font-size: 20px; font-weight: bold; padding: 12px 8px; font-style: italic; }
                         .arrow { font-size: 16px; margin: 0 5px; }
-                        h2 { color: #1a365d; }
+                        h2, h3 { color: #1a365d; }
                         .info-text { font-size: 14px; color: #666; margin-top: 5px; font-style: italic; }
                     </style>
                 </head>
