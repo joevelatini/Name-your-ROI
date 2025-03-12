@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ActivTrak ROI Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .calculator {
+            margin-bottom: 30px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: inline-block;
+            margin-right: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            padding: 8px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #1a365d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2a4a7d;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #1a365d;
+            color: white;
+            padding: 10px 8px;
+        }
+        .metrics-row td {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 8px;
+        }
+        .arrow {
+            font-size: 16px;
+            margin: 0 5px;
+        }
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        h1, h2 {
+            color: #1a365d;
+        }
+        .export-btn {
+            background-color: #4a6285;
+        }
+    </style>
+</head>
+<body>
+    <h1>ActivTrak ROI Calculator</h1>
+    
+    <div class="calculator">
+        <h2>Input Parameters</h2>
+        
+        <div class="form-group">
+            <label for="employees">Number of Employees:</label>
+            <input type="number" id="employees" min="1" value="400">
+        </div>
+        
+        <div class="form-group">
+            <label for="annual-cost">Annual ActivTrak Cost ($):</label>
+            <input type="number" id="annual-cost" min="0" value="48000">
+        </div>
+        
+        <div class="form-group">
+            <label for="avg-salary">Average Annual Salary ($):</label>
+            <input type="number" id="avg-salary" min="0" value="60000">
+        </div>
+        
+        <div>
+            <button id="calculate">Calculate ROI</button>
+        </div>
+    </div>
+    
+    <div class="results" id="results">
+        <h2>ROI Results for <span id="company-size">400</span> Person Business Spending $<span id="annual-spend">48,000</span></h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Average Daily Productivity</th>
+                    <th>Percentage Teams* with >10% underutilization</th>
+                    <th>Total Untapped Capacity</th>
+                    <th>Monthly Productivity Loss ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="metrics-row">
+                    <td><span id="current-productivity">7.5</span> <span class="arrow">→</span> <span id="future-productivity">8.0</span></td>
+                    <td><span id="current-underutilized">30%</span> <span class="arrow">→</span> <span id="future-underutilized">15%</span></td>
+                    <td><span id="current-untapped">200</span> <span class="arrow">→</span> <span id="future-untapped">100</span></td>
+                    <td><span id="current-loss">$50,000</span> <span class="arrow">→</span> <span id="future-loss">$25,000</span></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Improvement (Hours)</th>
+                    <th>Productivity Gain Per Day (Hours)</th>
+                    <th>Productivity Gain Per Day (FTE)</th>
+                    <th>Savings</th>
+                    <th>ROI ($)</th>
+                </tr>
+            </thead>
+            <tbody id="roi-table-body">
+                <!-- This will be populated by JavaScript -->
+            </tbody>
+        </table>
+        
+        <p class="info-text">*Based on $<span id="salary-display">60,000</span> salary and 50-weeks of work/year.</p>
+        
+        <button id="export-html" class="export-btn">Export Results</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const calculateBtn = document.getElementById('calculate');
+            const exportBtn = document.getElementById('export-html');
+            
+            // Initialize the ROI table with default values
+            updateROITable();
+            
+            // Event listeners
+            calculateBtn.addEventListener('click', updateROITable);
+            exportBtn.addEventListener('click', exportResults);
+            
+            function updateROITable() {
+                // Get input values - only the three editable fields
+                const employees = parseInt(document.getElementById('employees').value) || 400;
+                const annualCost = parseInt(document.getElementById('annual-cost').value) || 48000;
+                const avgSalary = parseInt(document.getElementById('avg-salary').value) || 60000;
+                
+                // Fixed values
+                const workWeeks = 50;
+                
+                // Update company info
+                document.getElementById('company-size').textContent = employees;
+                document.getElementById('annual-spend').textContent = annualCost.toLocaleString();
+                document.getElementById('salary-display').textContent = avgSalary.toLocaleString();
+                
+                // Calculate ROI for different improvement levels
+                const improvements = [0.1, 0.25, 0.5, 0.75, 1];
+                const tableBody = document.getElementById('roi-table-body');
+                tableBody.innerHTML = ''; // Clear existing rows
+                
+                improvements.forEach(improvement => {
+                    // Calculate gain in hours
+                    const hoursGain = improvement * employees;
+                    // Convert to FTE (assuming 8-hour workday)
+                    const fteGain = hoursGain / 8;
+                    // Calculate annual savings
+                    const savings = fteGain * avgSalary;
+                    // Calculate ROI
+                    const roi = savings / annualCost;
+                    
+                    // Create a new row
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${improvement}</td>
+                        <td>${hoursGain}</td>
+                        <td>${fteGain}</td>
+                        <td>$${savings.toLocaleString()}</td>
+                        <td>${roi.toFixed(1)}x</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            function exportResults() {
+                // Get the current HTML content
+                const resultsSection = document.getElementById('results').cloneNode(true);
+                
+                // Remove the export button from the cloned results
+                const exportButton = resultsSection.querySelector('#export-html');
+                if (exportButton) {
+                    exportButton.remove();
+                }
+                
+                // Create a new HTML document
+                const htmlContent = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>ActivTrak ROI Results</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                        th { background-color: #1a365d; color: white; }
+                        .metrics-row td { font-size: 20px; font-weight: bold; padding: 12px 8px; }
+                        .arrow { font-size: 16px; margin: 0 5px; }
+                        h2 { color: #1a365d; }
+                        .info-text { font-size: 14px; color: #666; margin-top: 5px; font-style: italic; }
+                    </style>
+                </head>
+                <body>
+                    ${resultsSection.outerHTML}
+                </body>
+                </html>
+                `;
+                
+                // Create a download link
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'activtrak_roi_results.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        });
+    </script>
+</body>
+</html>
