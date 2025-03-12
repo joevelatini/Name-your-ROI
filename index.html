@@ -117,26 +117,6 @@
     <div class="results" id="results">
         <h2>ROI Results for <span id="company-size">400</span> Person Business Spending $<span id="annual-spend">48,000</span></h2>
         
-        <h3>Examples:</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Average Daily Productivity</th>
-                    <th>Percentage Teams* with >10% underutilization</th>
-                    <th>Total Untapped Capacity</th>
-                    <th>Monthly Productivity Loss ($)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="metrics-row">
-                    <td><i><span id="current-productivity">7.5</span> <span class="arrow">→</span> <span id="future-productivity">8.0</span></i></td>
-                    <td><i><span id="current-underutilized">30%</span> <span class="arrow">→</span> <span id="future-underutilized">15%</span></i></td>
-                    <td><i><span id="current-untapped">200</span> <span class="arrow">→</span> <span id="future-untapped">100</span></i></td>
-                    <td><i><span id="current-loss">$50,000</span> <span class="arrow">→</span> <span id="future-loss">$25,000</span></i></td>
-                </tr>
-            </tbody>
-        </table>
-        
         <table>
             <thead>
                 <tr>
@@ -176,36 +156,45 @@
                 const annualCost = parseInt(document.getElementById('annual-cost').value) || 48000;
                 const avgSalary = parseInt(document.getElementById('avg-salary').value) || 60000;
                 
-                // Fixed values
-                const workWeeks = 50;
-                
                 // Update company info
                 document.getElementById('company-size').textContent = employees;
                 document.getElementById('annual-spend').textContent = annualCost.toLocaleString();
                 document.getElementById('salary-display').textContent = avgSalary.toLocaleString();
                 
                 // Calculate ROI for different improvement levels
-                const improvements = [0.1, 0.25, 0.5, 0.75, 1];
                 const tableBody = document.getElementById('roi-table-body');
                 tableBody.innerHTML = ''; // Clear existing rows
                 
-                improvements.forEach(improvement => {
-                    // Calculate gain in hours
-                    const hoursGain = improvement * employees;
-                    // Convert to FTE (assuming 8-hour workday)
-                    const fteGain = hoursGain / 8;
-                    // Calculate annual savings
-                    const dailyRate = avgSalary / (workWeeks * 5); // Daily salary rate
-                    const savings = fteGain * avgSalary;
-                    // Calculate ROI
-                    const roi = savings / annualCost;
+                // Define the improvements and their corresponding values for a standard 400-employee business
+                const standardImprovements = [
+                    { improvement: 0.1, hoursPerDay: 40, fteEquivalent: 5, savings: 300000, roi: 5.25 },
+                    { improvement: 0.25, hoursPerDay: 100, fteEquivalent: 12.5, savings: 750000, roi: 14.6 },
+                    { improvement: 0.5, hoursPerDay: 200, fteEquivalent: 25, savings: 1500000, roi: 30.25 },
+                    { improvement: 0.75, hoursPerDay: 300, fteEquivalent: 37.5, savings: 2250000, roi: 44.8 },
+                    { improvement: 1, hoursPerDay: 400, fteEquivalent: 50, savings: 3000000, roi: 52.5 }
+                ];
+                
+                // Adjust the values based on the number of employees and salary
+                standardImprovements.forEach(function(item) {
+                    // Scale hours and FTE proportionally to employee count
+                    const scaleFactor = employees / 400;
+                    const hoursGain = Math.round(item.hoursPerDay * scaleFactor);
+                    const fteGain = (item.fteEquivalent * scaleFactor);
+                    
+                    // Scale savings proportionally to employee count and salary
+                    const salaryFactor = avgSalary / 60000;
+                    const savings = Math.round(item.savings * scaleFactor * salaryFactor);
+                    
+                    // Calculate ROI using the same proportional scaling approach
+                    const costFactor = annualCost / 48000;
+                    const roi = item.roi * (scaleFactor * salaryFactor / costFactor);
                     
                     // Create a new row
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${improvement}</td>
+                        <td>${item.improvement}</td>
                         <td>${hoursGain}</td>
-                        <td>${fteGain}</td>
+                        <td>${fteGain.toFixed(1)}</td>
                         <td>$${savings.toLocaleString()}</td>
                         <td>${roi.toFixed(1)}x</td>
                     `;
@@ -235,7 +224,6 @@
                         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
                         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
                         th { background-color: #1a365d; color: white; }
-                        .metrics-row td { font-size: 20px; font-weight: bold; padding: 12px 8px; font-style: italic; }
                         .arrow { font-size: 16px; margin: 0 5px; }
                         h2, h3 { color: #1a365d; }
                         .info-text { font-size: 14px; color: #666; margin-top: 5px; font-style: italic; }
