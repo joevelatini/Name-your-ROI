@@ -48,11 +48,19 @@
         }
         .results {
             margin-top: 30px;
+            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+            font-size: 12pt;
+        }
+        .results h2, .results h3 {
+            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+            font-size: 18pt;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+            font-size: 12pt;
         }
         th, td {
             border: 1px solid #ddd;
@@ -75,16 +83,19 @@
             margin: 0 5px;
         }
         .info-text {
-            font-size: 14px;
+            font-size: 12pt;
             color: #666;
             margin-top: 5px;
             font-style: italic;
+            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
         }
         h1, h2, h3 {
             color: #1a365d;
         }
         .export-btn {
             background-color: #4a6285;
+            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+            font-size: 12pt;
         }
     </style>
 </head>
@@ -212,7 +223,7 @@
                     exportButton.remove();
                 }
                 
-                // Create a new HTML document
+                // Create a new HTML document with Century Gothic font
                 const htmlContent = `
                 <!DOCTYPE html>
                 <html lang="en">
@@ -220,13 +231,33 @@
                     <meta charset="UTF-8">
                     <title>ActivTrak ROI Results</title>
                     <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        body { 
+                            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif; 
+                            font-size: 12pt;
+                            margin: 20px; 
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin: 20px 0; 
+                            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+                            font-size: 12pt;
+                        }
                         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
                         th { background-color: #1a365d; color: white; }
                         .arrow { font-size: 16px; margin: 0 5px; }
-                        h2, h3 { color: #1a365d; }
-                        .info-text { font-size: 14px; color: #666; margin-top: 5px; font-style: italic; }
+                        h2, h3 { 
+                            color: #1a365d; 
+                            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+                            font-size: 18pt;
+                        }
+                        .info-text { 
+                            font-size: 12pt; 
+                            color: #666; 
+                            margin-top: 5px; 
+                            font-style: italic; 
+                            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+                        }
                     </style>
                 </head>
                 <body>
