@@ -78,6 +78,10 @@
             padding: 12px 8px;
             font-style: italic;
         }
+        .improvement-hours {
+            font-weight: bold !important;
+            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+        }
         .arrow {
             font-size: 16px;
             margin: 0 5px;
@@ -203,10 +207,10 @@
                     // Create a new row
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${item.improvement}</td>
+                        <td><strong>${item.improvement}</strong></td>
                         <td>${hoursGain}</td>
                         <td>${fteGain.toFixed(1)}</td>
-                        <td>$${savings.toLocaleString()}</td>
+                        <td>${savings.toLocaleString()}</td>
                         <td>${roi.toFixed(1)}x</td>
                     `;
                     tableBody.appendChild(row);
@@ -245,6 +249,7 @@
                         }
                         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
                         th { background-color: #1a365d; color: white; }
+                        .improvement-hours { font-weight: bold !important; }
                         .arrow { font-size: 16px; margin: 0 5px; }
                         h2, h3 { 
                             color: #1a365d; 
