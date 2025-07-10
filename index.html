@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ActivTrak ROI Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -218,69 +220,55 @@
             }
             
             function exportResults() {
-                // Get the current HTML content
-                const resultsSection = document.getElementById('results').cloneNode(true);
+                // Get the results section
+                const resultsSection = document.getElementById('results');
                 
-                // Remove the export button from the cloned results
-                const exportButton = resultsSection.querySelector('#export-html');
-                if (exportButton) {
-                    exportButton.remove();
-                }
+                // Temporarily hide the export button
+                const exportButton = document.getElementById('export-html');
+                exportButton.style.display = 'none';
                 
-                // Create a new HTML document with Century Gothic font
-                const htmlContent = `
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>ActivTrak ROI Results</title>
-                    <style>
-                        body { 
-                            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif; 
-                            font-size: 12pt;
-                            margin: 20px; 
-                        }
-                        table { 
-                            width: 100%; 
-                            border-collapse: collapse; 
-                            margin: 20px 0; 
-                            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
-                            font-size: 12pt;
-                        }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-                        th { background-color: #1a365d; color: white; }
-                        .improvement-hours { font-weight: bold !important; }
-                        .arrow { font-size: 16px; margin: 0 5px; }
-                        h2, h3 { 
-                            color: #1a365d; 
-                            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
-                            font-size: 18pt;
-                        }
-                        .info-text { 
-                            font-size: 12pt; 
-                            color: #666; 
-                            margin-top: 5px; 
-                            font-style: italic; 
-                            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${resultsSection.outerHTML}
-                </body>
-                </html>
-                `;
-                
-                // Create a download link
-                const blob = new Blob([htmlContent], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'activtrak_roi_results.html';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                // Use html2canvas to capture the results section
+                html2canvas(resultsSection, {
+                    scale: 2, // Higher scale for better quality
+                    logging: false,
+                    useCORS: true
+                }).then(canvas => {
+                    // Restore the export button
+                    exportButton.style.display = 'inline-block';
+                    
+                    // Initialize jsPDF
+                    const { jsPDF } = window.jspdf;
+                    
+                    // Calculate dimensions
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 297; // A4 height in mm
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    let heightLeft = imgHeight;
+                    
+                    // Create PDF
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    let position = 10; // Start 10mm from top
+                    
+                    // Add the image to PDF
+                    const imgData = canvas.toDataURL('image/png');
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth - 20, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    // Add new pages if content is longer than one page
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth - 20, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    // Save the PDF
+                    pdf.save('activtrak_roi_results.pdf');
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    exportButton.style.display = 'inline-block';
+                    alert('Error generating PDF. Please try again.');
+                });
             }
         });
     </script>
